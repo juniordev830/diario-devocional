@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { blankEntry, cleanThemes, filterEntries, isDate, mergeBackup, parseBackup, toMarkdown } from '../src/journal.ts';
+import { blankEntry, cleanThemes, filterEntries, isDate, mergeBackup, parseBackup, parseStoredEntries, toMarkdown } from '../src/journal.ts';
 
 const entry = { ...blankEntry('2026-11-14'), id: 'estudo-1', title: 'Oração', body: 'Crescer em comunidade.', passage: 'Atos 2', themes: ['Comunhão'], favorite: true };
 const wrap = (entries: unknown[]) => JSON.stringify({ version: 1, entries });
@@ -28,4 +28,11 @@ test('restauração rejeita IDs duplicados e preserva edição local em conflito
 });
 test('Markdown inclui título, passagem, temas e conteúdo', () => {
   assert.match(toMarkdown([entry]), /## Oração[\s\S]+Atos 2[\s\S]+Comunhão[\s\S]+Crescer em comunidade/);
+});
+
+test('um registro local inválido pode ser detectado antes de renderizar o diário', () => {
+  assert.deepEqual(parseStoredEntries('[]'), []);
+  assert.throws(() => parseStoredEntries('{}'), /formato inválido/);
+  assert.throws(() => parseStoredEntries('[{"id":"a"}]'), /formato inválido/);
+  assert.throws(() => parseStoredEntries('['), SyntaxError);
 });
