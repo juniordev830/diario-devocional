@@ -32,6 +32,15 @@ function isEntry(value: unknown): value is Entry {
     && entry.themes.length <= 12 && entry.themes.every(theme => typeof theme === 'string' && theme.trim().length && theme.length <= 40);
 }
 
+export function parseStoredEntries(source: string): Entry[] {
+  const value: unknown = JSON.parse(source);
+  if (!Array.isArray(value) || !value.every(isEntry) ||
+      new Set(value.map(entry => entry.id)).size !== value.length) {
+    throw new Error('Os registros locais do diário têm um formato inválido.');
+  }
+  return value;
+}
+
 export function parseBackup(source: string): Entry[] {
   if (source.length > 5_000_000) throw new Error('O arquivo excede o limite de 5 MB.');
   let value: unknown;

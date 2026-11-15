@@ -2,13 +2,13 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { dateKey, monthDays } from './dates.ts';
 import { download } from './download.ts';
-import { blankEntry, cleanThemes, filterEntries, isDate, mergeBackup, parseBackup, toMarkdown } from './journal.ts';
+import { blankEntry, cleanThemes, filterEntries, isDate, mergeBackup, parseBackup, parseStoredEntries, toMarkdown } from './journal.ts';
 import type { Entry } from './journal.ts';
 import { useLocalState } from './storage.ts';
 
 export default function App() {
   const today = dateKey();
-  const [entries, setEntries, storageError] = useLocalState<Entry[]>('devocional-v1', []);
+  const [entries, setEntries, storageError] = useLocalState<Entry[]>('devocional-v1', [], parseStoredEntries);
   const [draft, setDraft] = useState(() => blankEntry(today));
   const [rawThemes, setThemes] = useState('');
   const [query, setQuery] = useState('');
