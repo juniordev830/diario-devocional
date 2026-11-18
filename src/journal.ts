@@ -11,13 +11,22 @@ export function isDate(value: string) {
   return Number.isFinite(+parsed) && parsed.toISOString().slice(0, 10) === value;
 }
 
-export function cleanThemes(text: string): string[] {
+function uniqueThemes(themes: string[]): string[] {
   const byName = new Map<string, string>();
-  for (const part of text.split(',')) {
-    const clean = part.trim().slice(0, 40);
-    if (clean && !byName.has(normalize(clean))) byName.set(normalize(clean), clean);
+  for (const theme of themes) {
+    const key = normalize(theme);
+    if (key && !byName.has(key)) byName.set(key, theme);
   }
-  return [...byName.values()].slice(0, 12);
+  return [...byName.values()];
+}
+
+export function cleanThemes(text: string): string[] {
+  return uniqueThemes(text.split(',').map(part => part.trim().slice(0, 40))).slice(0, 12);
+}
+
+export function collectThemes(entries: Entry[]): string[] {
+  return uniqueThemes(entries.flatMap(entry => entry.themes))
+    .sort((left, right) => left.localeCompare(right, 'pt-BR'));
 }
 
 function isEntry(value: unknown): value is Entry {

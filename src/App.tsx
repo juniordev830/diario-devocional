@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { dateKey, monthDays } from './dates.ts';
 import { download } from './download.ts';
-import { blankEntry, cleanThemes, filterEntries, isDate, mergeBackup, parseBackup, parseStoredEntries, toMarkdown } from './journal.ts';
+import { blankEntry, cleanThemes, collectThemes, filterEntries, isDate, mergeBackup, parseBackup, parseStoredEntries, toMarkdown } from './journal.ts';
 import type { Entry } from './journal.ts';
 import { useLocalState } from './storage.ts';
 
@@ -20,7 +20,7 @@ export default function App() {
   const [error, setError] = useState('');
   const [removing, setRemoving] = useState('');
   const shown = filterEntries(entries, query, theme, day, favorites);
-  const themes = cleanThemes(entries.flatMap(entry => entry.themes).join(','));
+  const themes = collectThemes(entries);
   const dates = monthDays(month);
   const offset = (new Date(dates[0] + 'T12:00:00').getDay() + 6) % 7;
   const markedDates = new Set(entries.map(entry => entry.date));
