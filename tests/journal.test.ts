@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { blankEntry, cleanThemes, filterEntries, isDate, mergeBackup, parseBackup, parseStoredEntries, toMarkdown } from '../src/journal.ts';
+import { blankEntry, cleanThemes, collectThemes, filterEntries, isDate, mergeBackup, parseBackup, parseStoredEntries, toMarkdown } from '../src/journal.ts';
 
 const entry = { ...blankEntry('2026-11-14'), id: 'estudo-1', title: 'Oração', body: 'Crescer em comunidade.', passage: 'Atos 2', themes: ['Comunhão'], favorite: true };
 const wrap = (entries: unknown[]) => JSON.stringify({ version: 1, entries });
@@ -11,6 +11,16 @@ test('busca ignora acentos e combina filtros de tema, data e favoritos', () => {
   assert.equal(filterEntries([{ ...entry, favorite: false }], '', '', '', true).length, 0);
 });
 test('temas são limpos e deduplicados', () => assert.deepEqual(cleanThemes(' Comunhão, , comunhao, Fé '), ['Comunhão', 'Fé']));
+test('filtro inclui temas de todos os registros e preserva nomes importados', () => {
+  const labels = Array.from({ length: 12 }, (_, index) => 'Tema ' + (index + 1));
+  const first = { ...entry, themes: labels };
+  const last = { ...entry, id: 'estudo-2', themes: ['Tema 1', 'Fé, esperança', 'fe, esperanca'] };
+  const themes = collectThemes([first, last]);
+  assert.equal(themes.length, 13);
+  assert.equal(themes[0], 'Fé, esperança');
+  assert.deepEqual(filterEntries([first, last], '', themes[0]), [last]);
+  assert.equal(cleanThemes([...labels, 'Fé'].join(',')).length, 12);
+});
 test('valida datas reais, incluindo ano bissexto', () => {
   assert.equal(isDate('2028-02-29'), true);
   assert.equal(isDate('2026-02-29'), false);
