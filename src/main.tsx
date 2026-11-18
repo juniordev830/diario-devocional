@@ -16,7 +16,11 @@ createRoot(document.getElementById('root')!).render(
     <main id="conteudo">
       <div className="intro">
         <h1>Diário devocional</h1>
-        <p>SUBDiário devocional</p>
+        <nav className="atalhos" aria-label="Seções desta página">
+          <a href="#editor">Escrever</a>
+          <a href="#calendario">Calendário</a>
+          <a href="#registros">Registros</a>
+        </nav>
       </div>
       <App />
     </main>

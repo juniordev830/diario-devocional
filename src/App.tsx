@@ -68,7 +68,7 @@ export default function App() {
   }
 
   return <div className="split">
-    <section className="panel stack">
+    <section className="panel stack" id="editor" tabIndex={-1}>
       <div className="row between">
         <h2>{draft.id ? 'Editar registro' : 'Novo registro'}</h2>
         {draft.id && <button onClick={() => edit(blankEntry(today))}>Novo registro</button>}
@@ -102,7 +102,7 @@ export default function App() {
       </details>
     </section>
     <aside className="stack">
-      <section className="panel stack">
+      <section className="panel stack" id="calendario" tabIndex={-1}>
         <label>Mês dos registros<input type="month" value={month} onChange={e => {
           if (/^\d{4}-\d{2}$/.test(e.target.value)) {
             setMonth(e.target.value);
@@ -117,7 +117,7 @@ export default function App() {
         </div>
         {day && <button onClick={() => setDay('')}>Limpar filtro de data</button>}
       </section>
-      <section className="panel stack">
+      <section className="panel stack" id="registros" tabIndex={-1}>
         <h2>Registros</h2>
         <label>Pesquisar<input type="search" placeholder="Título, tema, passagem ou anotação" value={query} onChange={e => setQuery(e.target.value)} /></label>
         <label>Filtrar tema<select value={theme} onChange={e => setTheme(e.target.value)}>
