@@ -8,7 +8,8 @@ import { useLocalState } from './storage.ts';
 
 export default function App() {
   const today = dateKey();
-  const [entries, setEntries, storageError] = useLocalState<Entry[]>('devocional-v1', [], parseStoredEntries);
+  const [entries, setEntries, storageError, storageBlocked, restoreStorage] =
+    useLocalState<Entry[]>('devocional-v1', [], parseStoredEntries);
   const [draft, setDraft] = useState(() => blankEntry(today));
   const [rawThemes, setThemes] = useState('');
   const [query, setQuery] = useState('');
@@ -45,7 +46,7 @@ export default function App() {
     setMonth(entry.date.slice(0, 7));
     setDay('');
     setError('');
-    setStatus('Registro salvo no navegador.');
+    setStatus(storageBlocked ? 'Registro atualizado nesta sessão.' : 'Registro salvo no navegador.');
   }
 
   function favorite(entry: Entry) {
@@ -60,6 +61,11 @@ export default function App() {
     try {
       if (file.size > 5_000_000) throw new Error('O arquivo excede o limite de 5 MB.');
       const restored = parseBackup(await file.text());
+      if (storageBlocked) {
+        if (!restored.length) throw new Error('Use um backup com pelo menos um registro para restaurar.');
+        if (!window.confirm('Substituir os dados locais ilegíveis por este backup?')) return;
+        restoreStorage();
+      }
       setEntries(previous => mergeBackup(previous, restored));
       setStatus('Backup mesclado. Registros existentes foram preservados.');
     } catch (cause) {
